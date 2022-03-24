@@ -173,6 +173,9 @@ func Send(options *Options, results interface{}) (*Content, error) {
 		// Processing the status
 		if res.StatusCode >= 400 {
 			if isRetryable(res.StatusCode, options.RetryableStatusCodes) {
+				// ft/exponential_backoff - Retry after header when 429
+				// if status code is 429: too many requests, check if has Retry-After header
+				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
 				if attempt+1 < options.Attempts {
 					log.Warnf("Retryable Response Status: %s", res.Status)
 					log.Infof("Waiting for %s before trying again", options.InterAttemptDelay)
